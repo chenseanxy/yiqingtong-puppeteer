@@ -1,0 +1,47 @@
+require('dotenv').config();
+const fs = require("fs");
+
+const username = process.env.XD_USERNAME;
+const password = process.env.XD_PASSWORD;
+const coords = {
+    "latitude": parseFloat(process.env.COORDS.split(",")[0]),
+    "longitude": parseFloat(process.env.COORDS.split(",")[1]),
+};
+
+const screenshotPath = process.env.SCREENSHOTPATH || "./screens";
+if (!fs.existsSync(screenshotPath)){
+    fs.mkdirSync(screenshotPath);
+}
+
+function lanuchConfig(){
+    const debug = {
+        headless: false,
+        args:[
+            '--disable-geolocation',
+            '--no-sandbox', 
+            '--disable-setuid-sandbox'
+        ],
+    };
+    
+    const prod = {
+    
+    };
+
+    if(process.env.DEBUG == 'true') return debug;
+    return prod;
+}
+
+if(username === "" || password === ""){
+    throw Error("Username or password not configured");
+};
+
+if(coords.latitude === "" || coords.longitude === ""){
+    throw Error("Geo coordinates not defined");
+};
+
+module.exports = {
+    username, password,
+    coords,
+    lanuchConfig,
+    screenshotPath,
+};
