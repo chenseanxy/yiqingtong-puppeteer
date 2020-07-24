@@ -13,7 +13,7 @@ services:
       ofelia.job-run.puppeteer.schedule: "0 15 16 * * *"      
 
   puppeteer:
-    image: chenseanxy/yiqingtong:latest
+    image: chenseanxy/yiqingtong-puppeteer:latest
     container_name: "yiqingtong_puppeteer"
     restart: "no"
     volumes:
