@@ -70,13 +70,17 @@ async function actions(page){
     await page.click('div.footers > a');
     await page.waitForSelector('div.page-loading-container', {hidden: true});
     await page.waitForSelector('div.wapcf-inner');
+    console.log("✔️  出现确认框");
 
     // Confirm
     await page.click('div.wapcf-btn-ok');
     await page.waitForSelector('div.page-loading-container', {hidden: true});
     await page.waitForSelector('div.wapat-inner');
+    console.log("✔️  已经确认，填报成功");
 
-    await page.screenshot({path: `${screenshotPrefix()}-result.png`});
+    const resultPath = `${screenshotPrefix()}-result.png`
+    await page.screenshot({path: resultPath});
+    console.log(`✔️  结果截图已保存至 ${resultPath}`);
 }
 
 (async () => {
