@@ -24,7 +24,12 @@ function lanuchConfig(){
     };
     
     const prod = {
-    
+        // headless: true, // Default
+        args:[
+            '--disable-geolocation',
+            '--no-sandbox', 
+            '--disable-setuid-sandbox'
+        ],
     };
 
     if(process.env.DEBUG == 'true') return debug;

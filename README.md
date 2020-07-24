@@ -4,19 +4,17 @@
 
 支持模拟位置信息。
 
-## 如何使用 - Docker - 将在更新后支持
-
-运行时需将`<Your-ID-Here>`及`<Your-Password-Here>`分别换成学号及统一认证登陆密码
+## 如何使用 - Docker
 
 ```bash
-mkdir tests_output && mkdir screens
+mkdir screens
 
 docker run --rm \
-    -e NW_USERNAME=<Your-ID-Here> \
-    -e NW_PASSWORD=<Your-Password-Here> \
-    -v $PWD/tests_output:/usr/src/app/tests_output \
+    -e XD_USERNAME=<Your-ID-Here> \
+    -e XD_PASSWORD=<Your-Password-Here> \
+    -e COORDS=<latitude>,<longtitude> \
     -v $PWD/screens:/usr/src/app/screens \
-    chenseanxy/yiqingtong
+    chenseanxy/yiqingtong-puppeteer
 ```
 
 ### Cron Scheduling

@@ -1,0 +1,22 @@
+version: "3"
+services:
+  ofelia:
+    image: mcuadros/ofelia:latest
+    restart: always
+    command: daemon --docker
+    depends_on: 
+      - puppeteer
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels: 
+      ofelia.job-run.puppeteer.container: "yiqingtong_puppeteer"
+      ofelia.job-run.puppeteer.schedule: "0 15 16 * * *"      
+
+  puppeteer:
+    image: chenseanxy/yiqingtong:latest
+    container_name: "yiqingtong_puppeteer"
+    restart: "no"
+    volumes:
+      - ./screens:/usr/src/app/screens
+    env_file: 
+      - .env
