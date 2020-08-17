@@ -9,8 +9,12 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     labels: 
-      ofelia.job-run.puppeteer.container: "yiqingtong_puppeteer"
-      ofelia.job-run.puppeteer.schedule: "0 15 16 * * *"      
+      ofelia.job-run.yiqingtong.container: "yiqingtong_puppeteer"
+      ofelia.job-run.yiqingtong.schedule: "0 15 16 * * *"      
+      # ofelia.job-run.checkup.container: "yiqingtong_puppeteer"
+      # ofelia.job-run.checkup.schedule: "0 15 9,13,18 * * *"
+    environment:
+      - TZ=Asia/Shanghai
 
   puppeteer:
     image: chenseanxy/yiqingtong-puppeteer:latest
