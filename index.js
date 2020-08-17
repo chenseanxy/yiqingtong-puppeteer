@@ -38,7 +38,7 @@ function screenshotPrefix(){
     return `${path}/${date}`
 }
 
-async function actions(page){
+async function yiqingtongActions(page){
     // Login page
     await page.goto('https://xxcapp.xidian.edu.cn/ncov/wap/default/index');
     console.log("✔️  成功加载登陆页面");
@@ -65,7 +65,6 @@ async function actions(page){
     
     await page.screenshot({path: `${screenshotPrefix()}-location.png`});
 
-
     // Submit
     await page.click('div.footers > a');
     await page.waitForSelector('div.page-loading-container', {hidden: true});
@@ -77,6 +76,44 @@ async function actions(page){
     await page.waitForSelector('div.page-loading-container', {hidden: true});
     await page.waitForSelector('div.wapat-inner');
     console.log("✔️  已经确认，填报成功");
+
+    const resultPath = `${screenshotPrefix()}-result.png`
+    await page.screenshot({path: resultPath});
+    console.log(`✔️  结果截图已保存至 ${resultPath}`);
+}
+
+async function checkupActions(page){
+    // Login page
+    await page.goto('https://xxcapp.xidian.edu.cn/site/ncov/xidiandailyup');
+    console.log("✔️  成功加载登陆页面");
+
+    await page.type('input[type=text]', config.username);
+    await page.type('input[type=password]', config.password);
+    await page.click('div.btn');
+
+    // Main Page
+    // Geolocation Section
+    await page.waitForNavigation();
+    console.log("✔️  登陆成功，成功加载填报页面");
+
+    await page.waitForSelector('div[name=area] > input[readonly=readonly]', {visible: true});
+    const locationField = await page.$("div[name=area] > input[readonly=readonly]");
+    await locationField.click();
+
+    // Wait for loader to appear & disapper
+    await page.waitForSelector('div.page-loading-container');
+    await page.waitForSelector('div.page-loading-container', {hidden: true});
+
+    // location should now be ready
+    const locResult = await locationField.evaluate(el => el.value);
+    console.log(`✔️  成功获取地理位置: ${locResult}`);
+    
+    await page.screenshot({path: `${screenshotPrefix()}-location.png`});
+
+    // Submit
+    await page.click('div.footers > a');
+    await page.waitForSelector('div.page-loading-container', {hidden: true});
+    console.log("✔️  填报成功");
 
     const resultPath = `${screenshotPrefix()}-result.png`
     await page.screenshot({path: resultPath});
@@ -105,12 +142,25 @@ async function actions(page){
     );
     
     try{
-        await actions(page);
+        if(config.mode == "yiqingtong"){
+            console.log("✔️  开始疫情通填报");
+            await yiqingtongActions(page);
+        } else if(config.mode == "checkup"){
+            console.log("✔️  开始晨午晚检填报");
+            await checkupActions(page);
+        } else {
+            throw Error("Mode should be \"yiqingtong\" or \"checkup\"");
+        }
     } catch(e) {
         const screenshot = `${screenshotPrefix()}-error.png`;
         await page.screenshot({path: screenshot});
         console.log(`❌ 填报失败, 截图已保存于 ${screenshot}`);
+        console.log(e)
     } finally {
+        if(config.debug){ 
+            await pause(); 
+        }
+
         await browser.close();
     }
 })();

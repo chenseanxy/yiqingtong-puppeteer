@@ -44,9 +44,15 @@ if(coords.latitude === "" || coords.longitude === ""){
     throw Error("Geo coordinates not defined");
 };
 
+const debug = process.env.DEBUG == 'true'
+
+const mode = process.env.MODE || "yiqingtong"
+
 module.exports = {
     username, password,
     coords,
     lanuchConfig,
     screenshotPath,
+    debug,
+    mode,
 };
