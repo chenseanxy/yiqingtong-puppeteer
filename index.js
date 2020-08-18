@@ -101,7 +101,7 @@ async function checkupActions(page){
     await locationField.click();
 
     // Wait for loader to appear & disapper
-    // await page.waitForSelector('div.page-loading-container');
+    await page.waitForSelector('div.page-loading-container');
     // TODO: currently div.page-loading-container doesn't appear on servers
     await page.waitForSelector('div.page-loading-container', {hidden: true});
 
@@ -114,7 +114,14 @@ async function checkupActions(page){
     // Submit
     await page.click('div.footers > a');
     await page.waitForSelector('div.page-loading-container', {hidden: true});
-    console.log("✔️  填报成功");
+    await page.waitForSelector('div.wapcf-inner');
+    console.log("✔️  出现确认框");
+
+    // Confirm
+    await page.click('div.wapcf-btn-ok');
+    await page.waitForSelector('div.page-loading-container', {hidden: true});
+    await page.waitForSelector('div.alert > p.success');
+    console.log("✔️  已经确认，填报成功");
 
     const resultPath = `${screenshotPrefix()}-result.png`
     await page.screenshot({path: resultPath});
