@@ -101,7 +101,11 @@ async function checkupActions(page){
     await locationField.click();
 
     // Wait for loader to appear & disapper
-    await page.waitForSelector('div.page-loading-container');
+    try{
+        await page.waitForSelector('div.page-loading-container');
+    } catch(e) {
+        console.log(e);
+    }
     // TODO: currently div.page-loading-container doesn't appear on servers
     await page.waitForSelector('div.page-loading-container', {hidden: true});
 
