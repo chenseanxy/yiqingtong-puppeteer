@@ -129,7 +129,7 @@ async function checkupActions(page){
     // Submit
     const submitBtn = await page.$("div.footers > a");
     const submitTxt = await submitBtn.evaluate(el => el.innerText.split('\n')[0]);
-    if(submitTxt.startsWith("您已提交过信息")){
+    if(submitTxt.startsWith("您已提交过信息") || submitTxt.startsWith("未到填报时间")){
         console.log("✔️  当前时段已填报过疫情通");
         await submitBtn.hover();
         await page.screenshot({path: `${screenshotPrefix()}-result.png`});
