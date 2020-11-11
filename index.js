@@ -43,7 +43,7 @@ function screenshotPrefix(){
 async function yiqingtongActions(page){
     // Login page
     await page.goto('https://xxcapp.xidian.edu.cn/ncov/wap/default/index');
-    await page.waitForNavigation();
+    await page.waitForNavigation({waitUntil:'networkidle0'});
     console.log("✔️  成功加载登陆页面");
 
     await page.waitForSelector('input[type=text]');
@@ -91,7 +91,7 @@ async function yiqingtongActions(page){
 async function checkupActions(page){
     // Login page
     await page.goto('https://xxcapp.xidian.edu.cn/site/ncov/xidiandailyup');
-    await page.waitForNavigation();
+    await page.waitForNavigation({waitUntil:'networkidle0'});
     console.log("✔️  成功加载登陆页面");
 
     await page.waitForSelector('input[type=text]');
