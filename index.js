@@ -1,6 +1,8 @@
 const puppeteer = require('puppeteer');
 const config = require('./config');
 const url = require('url');
+const fs = require('fs');
+const { exception } = require('console');
 
 function pause(ms) {
     // If time not specified, pause forever
@@ -33,7 +35,7 @@ function interceptRequest(request) {
 }
 
 function screenshotPrefix(){
-    const date = new Date().toString().replace(/:| /g, '-');
+    const date = new Date().toISOString().replace(/:| /g, '-');
     const path = config.screenshotPath;
     return `${path}/${date}`
 }
@@ -42,6 +44,9 @@ async function yiqingtongActions(page){
     // Login page
     await page.goto('https://xxcapp.xidian.edu.cn/ncov/wap/default/index');
     console.log("✔️  成功加载登陆页面");
+
+    await page.waitForSelector('input[type=text]');
+    await page.waitForSelector('input[type=password]');
 
     await page.type('input[type=text]', config.username);
     await page.type('input[type=password]', config.password);
@@ -87,6 +92,9 @@ async function checkupActions(page){
     await page.goto('https://xxcapp.xidian.edu.cn/site/ncov/xidiandailyup');
     console.log("✔️  成功加载登陆页面");
 
+    await page.waitForSelector('input[type=text]');
+    await page.waitForSelector('input[type=password]');
+
     await page.type('input[type=text]', config.username);
     await page.type('input[type=password]', config.password);
     await page.click('div.btn');
@@ -100,14 +108,17 @@ async function checkupActions(page){
     const locationField = await page.$("div[name=area] > input[readonly=readonly]");
     await locationField.click();
 
-    // Wait for loader to appear & disapper
-    try{
-        await page.waitForSelector('div.page-loading-container');
-    } catch(e) {
-        console.log(e);
-    }
-    // TODO: currently div.page-loading-container doesn't appear on servers
-    await page.waitForSelector('div.page-loading-container', {hidden: true});
+    // // TODO: currently div.page-loading-container doesn't appear on servers
+    // // Wait for loader to appear & disapper
+    // try{
+    //     await page.waitForSelector('div.page-loading-container');
+    // } catch(e) {
+        
+    // }
+    // await page.waitForSelector('div.page-loading-container', {hidden: true});
+
+    // Workaround: just give it a 3 second timeout
+    await pause(3000);
 
     // location should now be ready
     const locResult = await locationField.evaluate(el => el.value);
@@ -116,6 +127,15 @@ async function checkupActions(page){
     await page.screenshot({path: `${screenshotPrefix()}-location.png`});
 
     // Submit
+    const submitBtn = await page.$("div.footers > a");
+    const submitTxt = await submitBtn.evaluate(el => el.innerText.split('\n')[0]);
+    if(submitTxt.startsWith("您已提交过信息")){
+        console.log("✔️  当前时段已填报过疫情通");
+        await submitBtn.hover();
+        await page.screenshot({path: `${screenshotPrefix()}-result.png`});
+        return;
+    }
+
     await page.click('div.footers > a');
     await page.waitForSelector('div.page-loading-container', {hidden: true});
     await page.waitForSelector('div.wapcf-inner');
@@ -124,7 +144,9 @@ async function checkupActions(page){
     // Confirm
     await page.click('div.wapcf-btn-ok');
     await page.waitForSelector('div.page-loading-container', {hidden: true});
-    await page.waitForSelector('div.alert > p.success');
+
+    await page.waitForSelector('p.success');
+
     console.log("✔️  已经确认，填报成功");
 
     const resultPath = `${screenshotPrefix()}-result.png`
@@ -136,8 +158,8 @@ async function checkupActions(page){
     const browser = await puppeteer.launch(config.lanuchConfig());
     const page = await browser.newPage();
 
-    page.setDefaultNavigationTimeout(5000);
-    page.setDefaultTimeout(2000);
+    page.setDefaultNavigationTimeout(15000);
+    page.setDefaultTimeout(5000);
 
     await page.emulate(puppeteer.devices['iPad']);
 
@@ -166,7 +188,9 @@ async function checkupActions(page){
     } catch(e) {
         const screenshot = `${screenshotPrefix()}-error.png`;
         await page.screenshot({path: screenshot});
-        console.log(`❌ 填报失败, 截图已保存于 ${screenshot}`);
+        const html = await page.content();
+        fs.writeFileSync(`${screenshotPrefix()}-error.html`, html);
+        console.log(`❌ 填报失败, 截图与HTML已保存于 ${config.screenshotPath}`);
         console.log(e)
     } finally {
         if(config.debug){ 
