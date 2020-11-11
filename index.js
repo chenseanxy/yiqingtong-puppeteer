@@ -34,10 +34,20 @@ function interceptRequest(request) {
     }
 }
 
+function getFormattedTime(){
+    const dt = new Date();
+    return [
+        dt.getFullYear().toString().padStart(4, '0'),
+        (dt.getMonth()+1).toString().padStart(2, '0'),
+        dt.getDate().toString().padStart(2, '0'),
+        dt.getHours().toString().padStart(2, '0'),
+        dt.getMinutes().toString().padStart(2, '0'),
+        dt.getSeconds().toString().padStart(2, '0')
+    ].join("-");
+}
+
 function screenshotPrefix(){
-    const date = new Date().toISOString().replace(/:| /g, '-');
-    const path = config.screenshotPath;
-    return `${path}/${date}`
+    return `${config.screenshotPath}/${getFormattedTime()}`
 }
 
 async function yiqingtongActions(page){
@@ -157,6 +167,8 @@ async function checkupActions(page){
 }
 
 (async () => {
+    console.log(`${getFormattedTime()} (${config.username})`)
+
     const browser = await puppeteer.launch(config.lanuchConfig());
     const page = await browser.newPage();
 
