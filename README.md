@@ -34,6 +34,10 @@ docker-compose up -d
 
 其中`docker-compose.yml`中 `0 15 16 * * *`表示在每天0:15:00执行（使用UTC时间，为UTC 16:15:00）。
 
+### 多用户 生成Compose File
+
+复制`config.example.yml`为`config.yml`，填入相应用户信息，运行`generate_compose.py`（需要PyYaml包）生成`docker-compose.yml` (会覆盖当前compose file)
+
 ## 如何使用 - 本地安装
 
 ### 安装Node.js

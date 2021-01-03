@@ -1,0 +1,14 @@
+users:
+  - name: any_name_you_want
+    username: XDU_STUDENT_ID
+    password: XDU_LOGIN_PASSWORD
+    coords: LATITUDE,LONGITUDE
+
+yiqingtong:
+  space_out: 30   # Schedule a job every 30 seconds
+  hours: [0, 4]   # Run at 0am and 4am every day
+
+checkup:
+  space_out: 30
+  hours: [7, 13, 18]
+  coords: 34.128908,108.832201  # Override, use XDU's location for checkups
