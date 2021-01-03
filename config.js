@@ -16,6 +16,7 @@ if (!fs.existsSync(screenshotPath)){
 function lanuchConfig(){
     const debug = {
         headless: false,
+        // devtools: true,
         args:[
             '--disable-geolocation',
             '--no-sandbox', 

@@ -53,7 +53,7 @@ function screenshotPrefix(){
 async function yiqingtongActions(page){
     // Login page
     await page.goto('https://xxcapp.xidian.edu.cn/ncov/wap/default/index');
-    await page.waitForNavigation({waitUntil:'networkidle0'});
+    await page.reload({waitUntil:['networkidle0', 'load']});
     console.log("✔️  成功加载登陆页面");
 
     await page.waitForSelector('input[type=text]');
@@ -71,9 +71,17 @@ async function yiqingtongActions(page){
     const locationField = await page.$("div[name=area] > input[readonly=readonly]");
     await locationField.click();
 
-    // Wait for loader to appear & disapper
-    await page.waitForSelector('div.page-loading-container');
-    await page.waitForSelector('div.page-loading-container', {hidden: true});
+    // // TODO: currently div.page-loading-container doesn't appear on servers
+    // // Wait for loader to appear & disapper
+    // try{
+    //     await page.waitForSelector('div.page-loading-container');
+    // } catch(e) {
+        
+    // }
+    // await page.waitForSelector('div.page-loading-container', {hidden: true});
+
+    // Workaround: just give it a 3 second timeout
+    await pause(3000);
 
     // location should now be ready
     const locResult = await locationField.evaluate(el => el.value);
@@ -82,8 +90,19 @@ async function yiqingtongActions(page){
     await page.screenshot({path: `${screenshotPrefix()}-location.png`});
 
     // Submit
+    const submitBtn = await page.$("div.footers > a");
+    const submitBtnClass = await submitBtn.evaluate(el => el.className);
+
     await page.click('div.footers > a');
     await page.waitForSelector('div.page-loading-container', {hidden: true});
+    
+    if(submitBtnClass && submitBtnClass.includes('wapcf-btn-qx')){
+        // Already sumbitted
+        console.log("✔️  当前时段已填报过疫情通");
+        await page.screenshot({path: `${screenshotPrefix()}-result.png`});
+        return;
+    }
+
     await page.waitForSelector('div.wapcf-inner');
     console.log("✔️  出现确认框");
 
@@ -101,7 +120,7 @@ async function yiqingtongActions(page){
 async function checkupActions(page){
     // Login page
     await page.goto('https://xxcapp.xidian.edu.cn/site/ncov/xidiandailyup');
-    await page.waitForNavigation({waitUntil:'networkidle0'});
+    await page.reload({waitUntil:['networkidle0', 'load']});
     console.log("✔️  成功加载登陆页面");
 
     await page.waitForSelector('input[type=text]');
