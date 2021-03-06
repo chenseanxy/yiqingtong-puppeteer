@@ -20,7 +20,7 @@ for mode in ["yiqingtong", "checkup"]:
     space_out = config[mode]["space_out"]
     hours = ",".join(str(i) for i in config[mode]["hours"])
     second = 0
-    minute = 0
+    minute = ",".join(str(i) for i in config[mode].get("minute", [0]))
     
     for user in users:
         name = user['name']
